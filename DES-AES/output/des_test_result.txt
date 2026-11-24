@@ -1,0 +1,4 @@
+PASS: các phép hoán vị
+PASS: lập lịch khóa
+PASS: hàm vòng (vòng 1)
+PASS: mã hóa và giải mã
