@@ -100,3 +100,30 @@ def mo_rong_khoa(khoa):
 
 def khoa_vong(w, i):                         # k_i gồm 4 từ w[4i..4i+3], mỗi từ là một cột
     return [[w[4 * i + c][r] for c in range(4)] for r in range(4)]    
+def ma_hoa(khoi, khoa, in_ra=False):
+    w = mo_rong_khoa(khoa)
+    st = nap_trang_thai(khoi)
+    st = add_round_key(st, khoa_vong(w, 0))
+    if in_ra:
+        print('Ban ro ^ k0    :', hex_st(st))
+    for i in range(1, NR + 1):
+        if in_ra:
+            print('Vong %d' % i)
+            print('  Bat dau       :', hex_st(st))
+        st = sub_bytes(st)
+        if in_ra:
+            print('  Sau SubBytes  :', hex_st(st))
+        st = shift_rows(st)
+        if in_ra:
+            print('  Sau ShiftRows :', hex_st(st))
+        if i < NR:                           # vòng cuối bỏ MixColumns
+            st = mix_columns(st)
+            if in_ra:
+                print('  Sau MixColumns:', hex_st(st))
+        k = khoa_vong(w, i)
+        if in_ra:
+            print('  Khoa vong     :', hex_st(k))
+        st = add_round_key(st, k)
+        if in_ra:
+            print('  Het vong      :', hex_st(st))
+    return doc_trang_thai(st)
