@@ -79,3 +79,24 @@ def mix_columns(st):
 
 def add_round_key(st, k):
     return [[st[r][c] ^ k[r][c] for c in range(4)] for r in range(4)]
+def sub_word(w):
+    return [SBOX[b] for b in w]
+
+
+def rot_word(w):
+    return w[1:] + w[:1]
+
+
+def mo_rong_khoa(khoa):
+    w = [list(khoa[4 * i: 4 * i + 4]) for i in range(4)]     # 4 từ đầu là khóa k
+    for i in range(4, 4 * (NR + 1)):                          # tạo w4 ... w43
+        t = w[i - 1]
+        if i % 4 == 0:
+            t = sub_word(rot_word(t))
+            t = [t[0] ^ RCON[i // 4 - 1]] + t[1:]             # xor Rcon[i/4]
+        w.append([a ^ b for a, b in zip(w[i - 4], t)])
+    return w
+
+
+def khoa_vong(w, i):                         # k_i gồm 4 từ w[4i..4i+3], mỗi từ là một cột
+    return [[w[4 * i + c][r] for c in range(4)] for r in range(4)]    
