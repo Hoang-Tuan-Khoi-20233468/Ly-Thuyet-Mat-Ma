@@ -1,6 +1,7 @@
-===== MÃ HÓA DES =====
-Khóa   = 133457799BBCDFF1
-Bản rõ = 0123456789ABCDEF
+===== MA HOA DES =====
+Khoa   = 133457799BBCDFF1
+Ban ro = 0123456789ABCDEF
+--- Buoc 1: Lap lich khoa (PC1 -> chia C, D -> dich vong -> PC2) ---
 C0 = 1111000011001100101010101111
 D0 = 0101010101100110011110001111
 Vong  1: C = 1110000110011001010101011111  D = 1010101011001100111100011110  K = 1B02EFFC7072
@@ -19,8 +20,10 @@ Vong 13: C = 0111111110000110011001010101  D = 0111101010101011001100111100  K =
 Vong 14: C = 1111111000011001100101010101  D = 1110101010101100110011110001  K = 5F43B7F2E73A
 Vong 15: C = 1111100001100110010101010111  D = 1010101010110011001111000111  K = BF918D3D3F0A
 Vong 16: C = 1111000011001100101010101111  D = 0101010101100110011110001111  K = CB3D8B0E17F5
+--- Buoc 2: Hoan vi dau IP, chia L0 (32 bit dau), R0 (32 bit sau) ---
 Sau IP: CC00CCFFF0AAF0AA
 L0 = CC00CCFF  R0 = F0AAF0AA
+--- Buoc 3: 16 vong Feistel: L_i = R_(i-1), R_i = L_(i-1) xor f(k_i, R_(i-1)) ---
           E(R)^K = 6117BA866527  S = 5C82B597  f = 234AA9BB
 Vong  1: L = F0AAF0AA  R = EF4A6544
           E(R)^K = 0C448DEB63EC  S = F8D03AAE  f = 3CAB87A3
@@ -53,7 +56,19 @@ Vong 14: L = 18C3155A  R = C28C960D
 Vong 15: L = C28C960D  R = 43423234
           E(R)^K = EB578F14565D  S = A7832429  f = C8C04F98
 Vong 16: L = 43423234  R = 0A4CD995
+--- Buoc 4: Doi cho R16 || L16, roi hoan vi cuoi IP^-1 ---
 Truoc IP^-1 (R16 L16): 0A4CD99543423234
-Bản mã = 85E813540F0AB405
-===== GIẢI MÃ DES =====
-Giải mã = 0123456789ABCDEF
+Ban ma = 85E813540F0AB405
+
+===== GIAI MA DES (dung 16 khoa vong theo thu tu nguoc) =====
+Giai ma = 0123456789ABCDEF
+
+===== DOI CHIEU VOI SACH (Vi du 2.35 den 2.40) =====
+IP(ban ro)       tinh duoc = CC00CCFFF0AAF0AA  sach = CC00CCFFF0AAF0AA  -> KHOP
+k1               tinh duoc = 1B02EFFC7072      sach = 1B02EFFC7072      -> KHOP
+k2               tinh duoc = 79AED9DBC9E5      sach = 79AED9DBC9E5      -> KHOP
+k16              tinh duoc = CB3D8B0E17F5      sach = CB3D8B0E17F5      -> KHOP
+EP(R0) xor k1    tinh duoc = 6117BA866527      sach = 6117BA866527      -> KHOP
+f(k1, R0)        tinh duoc = 234AA9BB          sach = 234AA9BB          -> KHOP
+Ban ma           tinh duoc = 85E813540F0AB405  sach = 85E813540F0AB405  -> KHOP
+Giai ma          tinh duoc = 123456789ABCDEF   sach = 123456789ABCDEF   -> KHOP

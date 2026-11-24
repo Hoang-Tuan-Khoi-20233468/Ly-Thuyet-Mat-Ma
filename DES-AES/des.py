@@ -64,6 +64,7 @@ def lap_lich_khoa(k, in_ra=False):
     C = v >> 28
     D = v & MASK28
     if in_ra:
+        print('--- Buoc 1: Lap lich khoa (PC1 -> chia C, D -> dich vong -> PC2) ---')
         print('C0 =', format(C, '028b'))
         print('D0 =', format(D, '028b'))
     khoa = []
@@ -78,20 +79,22 @@ def lap_lich_khoa(k, in_ra=False):
     return khoa
 
 
-# ---------- DES = IP^-1 o sigma o rho16 o ... o rho1 o IP (công thức 2.30) ----------
 def des(x, khoa, in_ra=False):
     x = hoan_vi_dau(x)
     L = x >> 32
     R = x & MASK32
     if in_ra:
+        print('--- Buoc 2: Hoan vi dau IP, chia L0 (32 bit dau), R0 (32 bit sau) ---')
         print('Sau IP: %016X' % x)
         print('L0 = %08X  R0 = %08X' % (L, R))
+        print('--- Buoc 3: 16 vong Feistel: L_i = R_(i-1), R_i = L_(i-1) xor f(k_i, R_(i-1)) ---')
     for i in range(16):
         L, R = R, L ^ ham_vong(khoa[i], R, in_ra)   # rho_i: (L, R) -> (R, L xor f(k_i, R))
         if in_ra:
             print('Vong %2d: L = %08X  R = %08X' % (i + 1, L, R))
     truoc = (R << 32) | L                 # phép đổi chỗ sigma: ghép R16 || L16
     if in_ra:
+        print('--- Buoc 4: Doi cho R16 || L16, roi hoan vi cuoi IP^-1 ---')
         print('Truoc IP^-1 (R16 L16): %016X' % truoc)
     return hoan_vi_cuoi(truoc)
 
@@ -105,14 +108,30 @@ def giai_ma(c, k, in_ra=False):
     khoa = lap_lich_khoa(k, in_ra)
     return des(c, khoa[::-1], in_ra)      # Mệnh đề 2.34: đảo thứ tự khóa vòng
 
+def doi_chieu(ten, tinh_duoc, theo_sach):
+    kq = 'KHOP' if tinh_duoc == theo_sach else 'KHONG KHOP'
+    print('%-16s tinh duoc = %-17X sach = %-17X -> %s' % (ten, tinh_duoc, theo_sach, kq))
 
 if __name__ == '__main__':
     K = 0x133457799BBCDFF1
     M = 0x0123456789ABCDEF
-    print('===== MÃ HÓA DES =====')
-    print('Khóa   = %016X' % K)
-    print('Bản rõ = %016X' % M)
+    print('===== MA HOA DES =====')
+    print('Khoa   = %016X' % K)
+    print('Ban ro = %016X' % M)
     C = ma_hoa(M, K, True)
-    print('Bản mã = %016X' % C)
-    print('===== GIẢI MÃ DES =====')
-    print('Giải mã = %016X' % giai_ma(C, K))
+    print('Ban ma = %016X' % C)
+    print()
+    print('===== GIAI MA DES (dung 16 khoa vong theo thu tu nguoc) =====')
+    P_ = giai_ma(C, K)
+    print('Giai ma = %016X' % P_)
+    print()
+    print('===== DOI CHIEU VOI SACH (Vi du 2.35 den 2.40) =====')
+    k = lap_lich_khoa(K)
+    doi_chieu('IP(ban ro)', hoan_vi_dau(M), 0xCC00CCFFF0AAF0AA)
+    doi_chieu('k1', k[0], 0x1B02EFFC7072)
+    doi_chieu('k2', k[1], 0x79AED9DBC9E5)
+    doi_chieu('k16', k[15], 0xCB3D8B0E17F5)
+    doi_chieu('EP(R0) xor k1', mo_rong(0xF0AAF0AA) ^ k[0], 0x6117BA866527)
+    doi_chieu('f(k1, R0)', ham_vong(k[0], 0xF0AAF0AA), 0x234AA9BB)
+    doi_chieu('Ban ma', C, 0x85E813540F0AB405)
+    doi_chieu('Giai ma', P_, M)
