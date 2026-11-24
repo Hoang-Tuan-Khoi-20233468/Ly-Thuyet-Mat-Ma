@@ -64,8 +64,8 @@ def lap_lich_khoa(k, in_ra=False):
     C = v >> 28
     D = v & MASK28
     if in_ra:
-        print('C0 = %028b' % C)
-        print('D0 = %028b' % D)
+        print('C0 =', format(C, '028b'))
+        print('D0 =', format(D, '028b'))
     khoa = []
     for i in range(16):
         C = dich_vong_trai(C, SHIFTS[i])
@@ -73,7 +73,8 @@ def lap_lich_khoa(k, in_ra=False):
         ki = hoan_vi_bit((C << 28) | D, PC2, 56)
         khoa.append(ki)
         if in_ra:
-            print('Vong %2d: C = %028b  D = %028b  K = %012X' % (i + 1, C, D, ki))
+            print('Vong %2d: C = %s  D = %s  K = %012X'
+                  % (i + 1, format(C, '028b'), format(D, '028b'), ki))
     return khoa
 
 
