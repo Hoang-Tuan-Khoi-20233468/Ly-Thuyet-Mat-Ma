@@ -45,3 +45,37 @@ def hop_the(x):              # y_i = u_i ^ u_{i+4} ^ u_{i+5} ^ u_{i+6} ^ u_{i+7}
 SBOX = [hop_the(x) for x in range(256)]
 assert SBOX[0x00] == 0x63 and SBOX[0x53] == 0xED and SBOX[0x11] == 0x82
 assert len(set(SBOX)) == 256                 # S là song ánh
+# Trạng thái: a[r][c] = in[r + 4c] (nạp theo cột)
+def nap_trang_thai(khoi):
+    return [[khoi[r + 4 * c] for c in range(4)] for r in range(4)]
+
+
+def doc_trang_thai(st):
+    return [st[r][c] for c in range(4) for r in range(4)]
+
+
+def hex_st(st):
+    return ''.join('%02x' % b for b in doc_trang_thai(st))
+
+
+def sub_bytes(st):
+    return [[SBOX[st[r][c]] for c in range(4)] for r in range(4)]
+
+
+def shift_rows(st):                          # hàng r dịch trái r vị trí
+    return [[st[r][(c + r) % 4] for c in range(4)] for r in range(4)]
+
+
+def mix_columns(st):
+    kq = [[0] * 4 for _ in range(4)]
+    for c in range(4):
+        a0, a1, a2, a3 = st[0][c], st[1][c], st[2][c], st[3][c]
+        kq[0][c] = nhan(2, a0) ^ nhan(3, a1) ^ a2 ^ a3
+        kq[1][c] = a0 ^ nhan(2, a1) ^ nhan(3, a2) ^ a3
+        kq[2][c] = a0 ^ a1 ^ nhan(2, a2) ^ nhan(3, a3)
+        kq[3][c] = nhan(3, a0) ^ a1 ^ a2 ^ nhan(2, a3)
+    return kq
+
+
+def add_round_key(st, k):
+    return [[st[r][c] ^ k[r][c] for c in range(4)] for r in range(4)]
